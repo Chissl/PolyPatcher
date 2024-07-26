@@ -13,11 +13,9 @@ import net.minecraftforge.client.model.ItemLayerModel;
 import net.minecraftforge.client.model.TRSRTransformation;
 //#endif
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -39,13 +37,12 @@ public abstract class ItemLayerModelMixin_ReduceQuadCount {
         return null;
     }
 
-    @Shadow
-    private static BakedQuad buildSideQuad(VertexFormat format,  Optional<TRSRTransformation> transform,  EnumFacing side,  int tint,  TextureAtlasSprite sprite,  int u,  int v) {
-        return null;
-    }
-
-    @Inject(method = "getQuadsForSprite", at = @At("HEAD"), cancellable = true)
-    public void patcher$reduceQuadCount(int tint,  TextureAtlasSprite sprite,  VertexFormat format,  Optional<TRSRTransformation> transform,  CallbackInfoReturnable<ImmutableList<BakedQuad>> cir) {
+    /**
+     * @author Mixces
+     * @reason Reduce quad count
+     */
+    @Overwrite
+    public ImmutableList<BakedQuad> getQuadsForSprite(int tint,  TextureAtlasSprite sprite,  VertexFormat format,  Optional<TRSRTransformation> transform) {
         ImmutableList.Builder<BakedQuad> builder = ImmutableList.builder();
         int uMax = sprite.getIconWidth();
         int vMax = sprite.getIconHeight();
@@ -154,7 +151,7 @@ public abstract class ItemLayerModelMixin_ReduceQuadCount {
         }
         builder.add(Objects.requireNonNull(buildQuad(format, transform, EnumFacing.NORTH, tint, 0.0f, 0.0f, 0.46875f, sprite.getMinU(), sprite.getMaxV(), 0.0f, 1.0f, 0.46875f, sprite.getMinU(), sprite.getMinV(), 1.0f, 1.0f, 0.46875f, sprite.getMaxU(), sprite.getMinV(), 1.0f, 0.0f, 0.46875f, sprite.getMaxU(), sprite.getMaxV())));
         builder.add(Objects.requireNonNull(buildQuad(format, transform, EnumFacing.SOUTH, tint, 0.0f, 0.0f, 0.53125f, sprite.getMinU(), sprite.getMaxV(), 1.0f, 0.0f, 0.53125f, sprite.getMaxU(), sprite.getMaxV(), 1.0f, 1.0f, 0.53125f, sprite.getMaxU(), sprite.getMinV(), 0.0f, 1.0f, 0.53125f, sprite.getMinU(), sprite.getMinV())));
-        cir.setReturnValue(builder.build());
+        return builder.build();
     }
 
     @Unique
@@ -168,8 +165,13 @@ public abstract class ItemLayerModelMixin_ReduceQuadCount {
         return pixels[u + (vMax - 1 - v) * uMax] >> 24 & 0xFF;
     }
 
-    @Inject(method = "buildSideQuad", at = @At("HEAD"), cancellable = true)
-    private static void patcher$reduceQuadCount2(VertexFormat format,  Optional<TRSRTransformation> transform,  EnumFacing side,  int tint,  TextureAtlasSprite sprite,  int u,  int v,  CallbackInfoReturnable<BakedQuad> cir) {
+
+    /**
+     * @author Mixces
+     * @reason Reduce quad count
+     */
+    @Overwrite
+    private static BakedQuad buildSideQuad(VertexFormat format,  Optional<TRSRTransformation> transform,  EnumFacing side,  int tint,  TextureAtlasSprite sprite,  int u,  int v) {
         int width = sprite.getIconWidth();
         int height = sprite.getIconHeight();
         float x0 = u / (float)width;
@@ -201,7 +203,7 @@ public abstract class ItemLayerModelMixin_ReduceQuadCount {
         float u3 = 16.0f * (x2 - dx);
         float v2 = 16.0f * (1.0f - y0 - dy);
         float v3 = 16.0f * (1.0f - y2 - dy);
-        cir.setReturnValue(buildQuad(format, transform, patcher$remap(side), tint, x0, y0, z0, sprite.getInterpolatedU(u2), sprite.getInterpolatedV(v2), x2, y2, z0, sprite.getInterpolatedU(u3), sprite.getInterpolatedV(v3), x2, y2, z2, sprite.getInterpolatedU(u3), sprite.getInterpolatedV(v3), x0, y0, z2, sprite.getInterpolatedU(u2), sprite.getInterpolatedV(v2)));
+        return buildQuad(format, transform, patcher$remap(side), tint, x0, y0, z0, sprite.getInterpolatedU(u2), sprite.getInterpolatedV(v2), x2, y2, z0, sprite.getInterpolatedU(u3), sprite.getInterpolatedV(v3), x2, y2, z2, sprite.getInterpolatedU(u3), sprite.getInterpolatedV(v3), x0, y0, z2, sprite.getInterpolatedU(u2), sprite.getInterpolatedV(v2));
     }
 
     @Unique

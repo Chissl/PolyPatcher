@@ -1,5 +1,5 @@
 # PolyPatcher
-<img src="https://wsrv.nl/?url=https%3A%2F%2Fpolyfrost.org%2Fimg%2Fcompact_vector.svg&n=-1&w=1000" width=56 /> ![Dev Workflow Status](https://img.shields.io/github/v/release/Polyfrost/PolyPatcher.svg?style=for-the-badge&color=1452cc&label=release)
+<img src="https://wsrv.nl/?url=https%3A%2F%2Fpolyfrost.org%2Fimg%2Fcompact_vector.svg&n=-1&w=1000" width=56  alt="oneconfig logo"/> ![Dev Workflow Status](https://img.shields.io/github/v/release/Polyfrost/PolyPatcher.svg?style=for-the-badge&color=1452cc&label=release)
 
 PolyPatcher is a Forge mod for 1.8.9 & 1.12.2 created to improve your all-around Minecraft experience, bringing tons of Quality of Life additions, performance improvements, and tons of Vanilla bug fixes.
 
@@ -11,7 +11,7 @@ This work, "PolyPatcher", is adapted from ["Patcher"](https://sk1er.club/mods/pa
   <summary>Bug Fixes</summary>
 
 # Bug Fixes
-- **Keep Shaders on Perspective change** - Resolve Vanilla shaders being cleared when changing perspective. *default
+- **Keep Shaders on Perspective Change** - Resolve Vanilla shaders being cleared when changing perspective. *default
 - **Parallax Fix** - Resolve the camera being too far back, seemingly making your eyes be in the back of your head. (Currently makes the F3 crosshair disappear.) **[MC-1846](https://bugs.mojang.com/browse/MC-1846)**.
 - **Culling Fix** - Resolve false negatives in frustum culling, creating invisible chunks in some cases. (Can negatively impact performance.) **[MC-63020](https://bugs.mojang.com/browse/MC-63020)** & **[MC-70850](https://bugs.mojang.com/browse/MC-70850)**
 - **Layers In Tab** - Resolve players sometimes not having a hat layer in Tab. *default
@@ -20,11 +20,13 @@ This work, "PolyPatcher", is adapted from ["Patcher"](https://sk1er.club/mods/pa
 - **Add Background to Book GUI** *(not in original)* - Adds the dark background to the book GUI like all other containers/menus.
 - **Resource Exploit Fix** - Resolve an exploit in 1.8 allowing servers to look through directories. *default
 - **Forge Chest Behavior** - Resolve forge changing vanilla chest behavior. *default
+- **Vanilla Held Item Lighting** *(not in original)* - Amends a Forge bug causing item sides to have incorrect lighting compared to Vanilla 1.8. *default
 </details>
 <details>
   <summary>Experimental</summary>
 
 # Experimental
+- **Entrypoint Caching** *(not in original)* - Cache Forge mod entry points, improving startup time as Forge no longer needs to walk through every class to find the @Mod annotation. Requires two restarts to take full effect. *default
 - **Improved Skin Rendering** *(not in original)* - Remove transparent pixels on skins instead of turning them black.
 - **HUD Caching** - Reuse frames from the HUD instead of constantly recreating them every frame, as most HUD elements will stay the same for a long amount of time. (This may cause stuff with animations to feel "choppy".)
 - **Cache FPS** *(not in original)* - The amount of frames to cache for the HUD.
@@ -40,6 +42,7 @@ This work, "PolyPatcher", is adapted from ["Patcher"](https://sk1er.club/mods/pa
 - **Remove Water FOV** *(not in original)* - Remove FOV change when underwater. *default
 - **FOV Modifier** - Allow for modifying FOV change states.
 - **Sprinting FOV** - Modify your FOV when sprinting.
+- **Flying FOV** *(not in original)* - Modify your FOV when flying.
 - **Bow FOV** - Modify your FOV when pulling back a bow.
 - **Speed FOV** - Modify your FOV when having the speed effect.
 - **Slowness FOV** - Modify Your FOV when having the slowness effect.
@@ -132,8 +135,7 @@ This work, "PolyPatcher", is adapted from ["Patcher"](https://sk1er.club/mods/pa
 - **Disable Enchantment Books** - Stop enchantment table books from rendering.
 - **Disable Item Frames** - Stop item frames from rendering.
 - **Disable Mapped Item frames** - Stop item frames only with maps as their item from rendering.
-- **Disable Unpickable Grounded Arrows** *(not in original)* - Stop arrows that are in the ground and cannot be picked up from rendering.
-- **Disable All Grounded Arrows** - Stop arrows that are in the ground from rendering, regardless of state.
+- **Disable Grounded Arrows** - Stop arrows that are in the ground from rendering.
 - **Disable Attached Arrows** - Stop arrows that are attached to a player from rendering.
 - **Disable Skulls** - Stop skulls from rendering.
 - **Disable Falling Blocks** *(not in original)* - Stops falling blocks from rendering.
@@ -225,30 +227,79 @@ This work, "PolyPatcher", is adapted from ["Patcher"](https://sk1er.club/mods/pa
   <summary>Changes from original mod</summary>
 
 # Changes from original mod
+
+PolyPatcher 1.10.0:
+- Boost performance by only rendering special tile entities once instead of twice per frame (e.g beacons)
+- Boost performance by unloading tile entities quicker
+- Boost performance by optimizing adding normals to vertex formats
+- Boost performance by reducing allocations in EnumFacing
+- Fix vanilla log spam with Util class
+- Fix vanilla texture manager memory leak
+- Fix vanilla enchantment memory leak
+
+- Fix vanilla server list from buffering
+- Fix vanilla light initializing too early
+- Fix vanilla bug where invalid tile entities try to render
+- Fix vanilla bug where entities don't render at certain camera angles below Y=0 and above Y=255
+- Fix vanilla bug where spaces are not trimmed in server address fields
+- Fix vanilla bug where the pumpkin overlay shows in spectator mode
+
+- Decrease startup time significantly by computing part of FML mod loading asynchronously
+- Decrease startup time by replacing unnecessary regexes during mod loading
+- Decrease startup time by skipping first baking in ModelLoader
+- Boost performance by switching some Forge internals over to FastUtil
+- Boost performance by improving insertion into Forge's inventory wrappers
+- Boost performance of Forge's block state implementation
+- Add micro-optimization in the FML registry
+- Reduce memory usage of Forge model transformations
+- Fix OBJModel-related Forge memory leaks
+- Fix Forge bug by skipping fatal models
+
+- "Entrypoint Caching" feature
+  - Cache Forge mod entry points, improving startup time as Forge no longer needs to walk through every class to find the @Mod annotation.
+  - This will only work after your second launch with PolyPatcher 1.10.0, because it needs to cache this data first.
+  - This decreases startup time significantly
+- Compact LUT Tables / Fast Math (replaces BetterFPS / OptiFine Fast Math)
+- Add toggle for cacti in "1.12 Farm Selection Boxes"
+  - This fixes cacti farming in SkyBlock.
+- New experimental option to improve head rendering by removing black pixels ("Improved Skin Rendering")
+- Add "Background to Book GUI"
+- Add "Flying FOV" to "FOV Modifier"
+
+- Fix compatibility with CensoredASM
+- Make "Resource Exploit Fix" not do any extra validation other than detecting the exploit
+- Fix "Compact Chat" scrolling
+- Fix entity outline compatibility with "Entity Culling"
+- Fix "HUDCaching" issues with vignette and crosshair color
+- Fix "FOV Modifier" with high speed or slowness
+
+PolyPatcher 1.9.2:
+
+None
+
+PolyPatcher 1.9.1:
+- Reload language-related managers only when selecting a new language in vanilla Minecraft
+- Fix parallax fix making debug crosshair disappear
+- Try-catch sound menu to prevent crashes
+
+PolyPatcher 1.9.0:
 - Replace Essential with OneConfig
 - Boost performance by batch-drawing tile entities
 - Boost performance by reducing quad counts in item models
-- Boost performance by decreasing size of sine and cosine lookup tables
-- Improve speed when changing language, mipmap level, and anisotropic filtering level
 - Fix Forge held item lighting to match vanilla
 - Fix vanilla bug where entering an entity in spectator mode while in third person applies shaders
 - Fix vanilla bug where enchantment glint takes up the whole slot
 - Fix vanilla bug where items glitch out when using negative scale
 - Fix vanilla sky lighting calculation
-- Fix compatability with LoliASM/CensoredASM
 - Add ability to change HUD Caching FPS
 - Add "Natural Capes" feature
 - Add "Pumpkin Overlay Opacity"
 - Add "Cleaner Night Vision" and "Disable Night Vision"
-- Add "Invert Hotbar Scrolling"
-- Add "Prevent Overflow Hotbar Scrolling"
+- Add Invert Hotbar Scrolling
+- Add Prevent Overflow Hotbar Scrolling
 - Add "Disable Falling Blocks"
-- Add "Exclude Cacti from 1.12 Boxes"
-- Add "Improved Skin Rendering"
-- Add "Add Background to Book GUI"
 - Replace "Remove Container Background" with "Container Background Opacity"
 - Replace "Nausea Effect" toggle to "Distortion Effects" slider
-- Split "Disable Grounded Arrows" into two settings ("Disable Unpickable Grounded Arrows" and "Disable All Grounded Arrows")
 - Add ability to change tile entity render distance
 - Add ability not to cull ender dragons and withers from Entity Culling
 - Fix very rare crash on Minecraft's main menu

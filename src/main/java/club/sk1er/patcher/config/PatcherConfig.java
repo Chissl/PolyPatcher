@@ -73,10 +73,23 @@ public class PatcherConfig extends Config {
     @Switch(
         name = "Player Void Rendering",
         description = "Resolve the black box around the player while in the void.",
-        category = "Bug Fixes", subcategory = "Rendering",
-        size = 2
+        category = "Bug Fixes", subcategory = "Rendering", size = 2
     )
     public static boolean playerVoidRendering = true;
+
+    @Info(
+        text = "OptiFine Custom Sky Fix also changes the rendering of the normal sky. Some people may prefer the original rendering.",
+        category = "Bug Fixes", subcategory = "Rendering",
+        type = InfoType.WARNING, size = 2
+    )
+    private static String customSkyFixInfo = "";
+
+    @Switch(
+        name = "OptiFine Custom Sky Fix",
+        description = "Resolve OptiFine creating a \"black box\" effect at the bottom of the sky when using custom skies.",
+        category = "Bug Fixes", subcategory = "Rendering", size = 2
+    )
+    public static boolean customSkyFix = true;
 
     @Info(
         text = "Alex Arm Position requires a restart once toggled.",
@@ -254,6 +267,14 @@ public class PatcherConfig extends Config {
         min = -5F, max = 5F
     )
     public static float sprintingFovModifierFloat = 1;
+
+    @Slider(
+        name = "Flying FOV",
+        description = "Modify your FOV when flying.",
+        category = "Miscellaneous", subcategory = "Field of View",
+        min = -5F, max = 5F
+    )
+    public static float flyingFovModifierFloat = 1;
 
     @Slider(
         name = "Bow FOV",
@@ -535,10 +556,18 @@ public class PatcherConfig extends Config {
     )
     public static boolean futureHitBoxes = true;
 
+    @Info(
+        text = "Exclude Cacti from 1.12 Boxes requires a restart once toggled.",
+        category = "Miscellaneous", subcategory = "Blocks",
+        type = InfoType.WARNING,
+        size = 2
+    )
+    private static boolean cactusHitboxExclusionInfo = true;
+
     @Switch(
         name = "Exclude Cacti from 1.12 Boxes",
         description = "Exclude cacti from the 1.12 selection box changes, as it would actually shrink rather than increase in size.",
-        category = "Miscellaneous", subcategory = "Blocks"
+        category = "Miscellaneous", subcategory = "Blocks", size = 2
     )
     public static boolean cactusHitboxExclusion = true;
 
@@ -732,18 +761,10 @@ public class PatcherConfig extends Config {
     public static boolean disableMappedItemFrames;
 
     @Switch(
-        name = "Disable Unpickable Grounded Arrows",
-        description = "Stop arrows that are in the ground and cannot be picked up from rendering.",
+        name = "Disable Grounded Arrows",
+        description = "Stop arrows that are in the ground from rendering.",
         category = "Performance", subcategory = "Entity Rendering"
     )
-    public static boolean disableUnpickableGroundedArrows;
-
-    @Switch(
-        name = "Disable All Grounded Arrows",
-        description = "Stop arrows that are in the ground from rendering, regardless of state.",
-        category = "Performance", subcategory = "Entity Rendering"
-    )
-    @VigilanceName(name = "Disable Grounded Arrows", category = "Performance", subcategory = "Entity Rendering")
     public static boolean disableGroundedArrows;
 
     @Switch(
@@ -951,10 +972,11 @@ public class PatcherConfig extends Config {
     // SCREENS
 
     @Switch(
-        name = "Inventory Position",
+        name = "Fixed Inventory Position",
         description = "Stop potion effects from shifting your inventory to the right.",
         category = "Screens", subcategory = "Inventory"
     )
+    @VigilanceName(name = "Inventory Position", category = "Screens", subcategory = "Inventory")
     public static boolean inventoryPosition = true;
 
     @Switch(
@@ -1303,23 +1325,28 @@ public class PatcherConfig extends Config {
 
     // EXPERIMENTAL
 
+    @Info(
+        text = "Requires two restarts to take full effect.",
+        category = "Experimental", subcategory = "Forge",
+        type = InfoType.WARNING
+    )
+    private static boolean cacheEntrypointsInfo = true;
+
     @Switch(
-        name = "Cache Entrypoints",
+        name = "Entrypoint Caching",
         description = "Cache Forge mod entry points, improving startup time as Forge no longer needs to walk through " +
             "every class to find the @Mod annotation.",
-        category = "Experimental", subcategory = "Mod Discovery"
+        category = "Experimental", subcategory = "Forge"
     )
     public static boolean cacheEntrypoints = true;
 
     @Button(
         name = "Reset Cache",
         description = "Reset the cache of Forge mod entry points.",
-        category = "Experimental", subcategory = "Mod Discovery",
-        text = "Reset"
+        category = "Experimental", subcategory = "Forge",
+        text = "Reset", size = 2
     )
-    public static void resetCache() {
-        EntrypointCaching.INSTANCE.resetCache();
-    }
+    public static Runnable resetCache = () -> EntrypointCaching.INSTANCE.resetCache();
 
     @Info(
         text = "Improved Skin Rendering can make some skins invisible. It requires a restart once toggled.",
@@ -1602,6 +1629,14 @@ public class PatcherConfig extends Config {
     )
     // HIDDEN OPTION!!!!!!! DO NOT REMOVE OR TOUCH
     public static boolean chatPositionOld;
+
+    @Info(
+        text = "These options have been replaced by other mods. Hover over the option name to see which mod replaces that feature.",
+        category = "Deprecated",
+        type = InfoType.WARNING,
+        size = 2
+    )
+    private static boolean deprecatedInfo = true;
 
     @Exclude public static boolean nauseaEffect = false;
     @Exclude public static float fireOverlayOpacity = 1F;
@@ -1930,7 +1965,8 @@ public class PatcherConfig extends Config {
 
             Arrays.asList(
                 "slownessFovModifierFloat", "speedFovModifierFloat",
-                "bowFovModifierFloat", "sprintingFovModifierFloat"
+                "bowFovModifierFloat", "sprintingFovModifierFloat",
+                "flyingFovModifierFloat"
             ).forEach(property -> addDependency(property, "allowFovModifying"));
 
             addDependency("logOptimizerLength", "logOptimizer");
@@ -1945,7 +1981,8 @@ public class PatcherConfig extends Config {
 
             Arrays.asList(
                 "entityRenderDistance", "playerRenderDistance",
-                "passiveEntityRenderDistance", "hostileEntityRenderDistance"
+                "passiveEntityRenderDistance", "hostileEntityRenderDistance",
+                "tileEntityRenderDistance"
             ).forEach(property -> addDependency(property, "entityRenderDistanceToggle"));
 
             addDependency("cacheFontData", "optimizedFontRenderer");
@@ -1964,7 +2001,7 @@ public class PatcherConfig extends Config {
                 "scrollToZoom", "normalZoomSensitivity", "customZoomSensitivity", "smoothZoomAnimation",
                 "smoothZoomAnimationWhenScrolling", "smoothZoomAlgorithm", "toggleToZoom", "normalFpsCounter",
                 "useVanillaMetricsRenderer", "renderHandWhenZoomed", "smartFullbright", "smartEntityCulling",
-                "dynamicZoomSensitivity"
+                "dynamicZoomSensitivity", "customSkyFix"
             ).forEach(property -> hideIf(property, noOptiFine));
 
             Supplier<Boolean> smoothFontDetected = () -> ClassTransformer.smoothFontDetected;
@@ -1977,18 +2014,12 @@ public class PatcherConfig extends Config {
             //noinspection ConstantConditions
             Supplier<Boolean> minecraft112 = () -> ForgeVersion.mcVersion.equals("1.12.2");
             Arrays.asList(
-                "resourceExploitFix", "newKeybindHandling", "separateResourceLoading", "futureHitBoxes", "cactusHitboxExclusion", "farmSelectionBoxesInfo",
+                "resourceExploitFix", "newKeybindHandling", "separateResourceLoading", "futureHitBoxes", "cactusHitboxExclusion", "farmSelectionBoxesInfo", "cactusHitboxExclusionInfo",
                 "leftHandInFirstPerson", "extendedChatLength", "chatPosition",
-                "parallaxFix", "extendChatBackground", "vanillaGlassPanes"
+                "parallaxFix", "extendChatBackground", "vanillaGlassPanes", "heldItemLighting"
             ).forEach(property -> hideIf(property, minecraft112));
 
             hideIf("keyboardLayout", () -> !SystemUtils.IS_OS_LINUX);
-
-            addDependency("disableGroundedArrows", "disableUnpickableGroundedArrows");
-            if (disableGroundedArrows && !disableUnpickableGroundedArrows) {
-                disableUnpickableGroundedArrows = true;
-                save();
-            }
         } catch (Exception e) {
             Patcher.instance.getLogger().error("Failed to access property.", e);
         }

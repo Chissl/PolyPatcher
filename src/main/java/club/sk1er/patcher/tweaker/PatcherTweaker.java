@@ -73,7 +73,7 @@ public class PatcherTweaker implements IFMLLoadingPlugin {
 
     @Override
     public String getModContainerClass() {
-        return null;
+        return "club.sk1er.patcher.PolyPatcher";
     }
 
     @Override

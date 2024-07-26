@@ -8,12 +8,6 @@ public class RenderArrowHook {
     public static boolean cancelRendering(EntityArrow entity) {
         boolean grounded = ((EntityArrowAccessor) entity).getInGround();
         boolean moving = entity.motionX > 0 || entity.motionY > 0 || entity.motionZ > 0;
-        return (PatcherConfig.disableMovingArrows && moving && !grounded) || ((PatcherConfig.disableGroundedArrows || (PatcherConfig.disableUnpickableGroundedArrows &&
-            //#if MC==10809
-            entity.canBePickedUp == 1
-            //#else
-            //$$ entity.pickupStatus == EntityArrow.PickupStatus.ALLOWED
-            //#endif
-        )) && grounded);
+        return (PatcherConfig.disableMovingArrows && moving && !grounded) || (PatcherConfig.disableGroundedArrows && grounded);
     }
 }

@@ -1,15 +1,26 @@
 package club.sk1er.patcher.mixins.bugfixes.optifine;
 
+import club.sk1er.patcher.config.PatcherConfig;
 import net.minecraft.client.renderer.RenderGlobal;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Dynamic;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.Slice;
 
 @Mixin(RenderGlobal.class)
 public class RenderGlobalMixin_FixSkyVBOs {
+
+    @Dynamic("OptiFine")
+    @Shadow
+    private int renderDistance;
+
+    @Dynamic("OptiFine")
+    @Shadow
+    private boolean vboEnabled = false;
+
     @Dynamic("OptiFine")
     @Redirect(
         method = "renderSky(Lnet/minecraft/client/renderer/WorldRenderer;FZ)V",
@@ -21,7 +32,7 @@ public class RenderGlobalMixin_FixSkyVBOs {
         )
     )
     private int patcher$distanceOverride(RenderGlobal instance) {
-        return 256;
+        return PatcherConfig.customSkyFix ? 256 : this.renderDistance;
     }
 
     @Dynamic("OptiFine")
@@ -35,6 +46,6 @@ public class RenderGlobalMixin_FixSkyVBOs {
         )
     )
     private boolean patcher$fixVBO(RenderGlobal instance) {
-        return false;
+        return !PatcherConfig.customSkyFix && this.vboEnabled;
     }
 }

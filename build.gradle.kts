@@ -117,12 +117,19 @@ dependencies {
         isTransitive = false
     }
 
+    if (platform.mcMinor < 12) {
+        shade("it.unimi.dsi:fastutil:8.5.13")
+    }
+
     modRuntimeOnly("me.djtheredstoner:DevAuth-${if (platform.isFabric) "fabric" else if (platform.isLegacyForge) "forge-legacy" else "forge-latest"}:1.2.0")
 
     // If we are building for legacy forge, includes the launch wrapper with `shade` as we configured earlier.
     if (platform.isLegacyForge) {
         compileOnly("org.spongepowered:mixin:0.7.11-SNAPSHOT")
         shade("cc.polyfrost:oneconfig-wrapper-launchwrapper:1.0.0-beta17")
+        modImplementation("org.polyfrost:legacy-crafty-crashes:1.0.0") {
+            isTransitive = false
+        }
     }
 }
 

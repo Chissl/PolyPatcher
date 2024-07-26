@@ -26,18 +26,24 @@ import java.util.Map;
 
 public class SoundHandler implements IResourceManagerReloadListener {
 
-    private final boolean isLoliASM; // why, why, why
+    private final boolean isWeirdASMMod; // why, why, why
 
     public SoundHandler() {
         this.previousActive = Display.isActive();
         handleFocusChange();
-        boolean isLoliASM = false;
+        boolean isWeirdASMMod = false;
         try {
             Class.forName("zone.rong.loliasm.api.mixins.RegistrySimpleExtender", false, getClass().getClassLoader());
-            isLoliASM = true;
+            isWeirdASMMod = true;
         } catch (ClassNotFoundException ignored) {
+            try {
+                Class.forName("mirror.normalasm.api.mixins.RegistrySimpleExtender", false, getClass().getClassLoader());
+                isWeirdASMMod = true;
+            } catch (ClassNotFoundException ignored2) {
+                // ignore
+            }
         }
-        this.isLoliASM = isLoliASM;
+        this.isWeirdASMMod = isWeirdASMMod;
     }
 
     private final Map<ResourceLocation, BasicOption> data = new HashMap<>();
@@ -98,7 +104,7 @@ public class SoundHandler implements IResourceManagerReloadListener {
     @Override
     public void onResourceManagerReload(IResourceManager resourceManager) {
         SoundRegistry soundRegistry = ((SoundHandlerAccessor) Minecraft.getMinecraft().getSoundHandler()).getSndRegistry();
-        Map<ResourceLocation, SoundEventAccessorComposite> sounds = isLoliASM ? ((RegistrySimpleAccessor) soundRegistry).getRegistryObjects() : ((SoundRegistryAccessor) soundRegistry).getSoundRegistry();
+        Map<ResourceLocation, SoundEventAccessorComposite> sounds = isWeirdASMMod ? ((RegistrySimpleAccessor) soundRegistry).getRegistryObjects() : ((SoundRegistryAccessor) soundRegistry).getSoundRegistry();
         new PatcherSoundConfig(data, sounds);
     }
 }
